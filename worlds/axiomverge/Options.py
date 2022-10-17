@@ -32,7 +32,7 @@ class DamageRando(Choice):
     option_mostlynerfs = 2
     option_balanced = 3
     option_mostlybuffs = 4
-    option_allbuffs = 5    
+    option_allbuffs = 5
 
 
 class AllowBlindNavigation(Toggle):
@@ -66,7 +66,7 @@ def is_option_enabled(world: MultiWorld, player: int, name: str) -> bool:
 
 def get_option_value(world: MultiWorld, player: int, name: str) -> Union[int, dict]:
     option = getattr(world, name, None)
-    if option == None:
+    if option is None:
         return 0
 
     return option[player].value

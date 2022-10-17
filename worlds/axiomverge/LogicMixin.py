@@ -5,26 +5,26 @@ from .Options import is_option_enabled
 class AxiomVergeLogic(LogicMixin):
     def _axiomverge_has_high_reach(self, world: MultiWorld, player: int):
         return self.has_any({'Trenchcoat', 'Red Coat', 'Grapple', 'Drone Teleport'})
-    
+
     def _axiomverge_can_reach_outer_attic(self, world: MultiWorld, player: int):
         return (self.has_any({'Red Coat', 'Drone Teleport'}, player) or
                 (self.has_any({'Grapple', 'Field Disruptor'}, player) and
                  self.has('Trenchcoat', player)))
-    
+
     def _axiomverge_can_reach_left_side_attic(self, world: MultiWorld, player: int):
         return (self._axiomverge_can_reach_outer_attic(world, player) or
                 self.has('Grapple', player))
-    
+
     def _axiomverge_can_hit_distant_switches(self, world: MultiWorld, player: int) -> bool:
         return (self._axiomverge_has_nova(world, player) or
                 self._axiomverge_has_dash(world, player) or
                 self._axiomverge_has_grapple(world, player) or
                 self._axiomverge_can_pass_laser_walls(world, player))
-    
+
     def _axiomverge_can_pass_laser_walls(self, world: MultiWorld, player: int) -> bool:
         return (self._axiomverge_has_kilver(world, player) or
                 self._axiomverge_has_dash(world, player))
-    
+
     def _axiomverge_has_kilver(self, world: MultiWorld, player: int) -> bool:
         return self.has_any({
             'Kilver',
@@ -42,8 +42,8 @@ class AxiomVergeLogic(LogicMixin):
             'Reflector',
             'Orbital Discharge',
             }, player) or
-            self._axiomverge_has_kilver(world, player))    
-    
+            self._axiomverge_has_kilver(world, player))
+
     def _axiomverge_has_weapon(self, world: MultiWorld, player: int) -> bool:
         return (self.has_any({
             'Axiom Disruptor',
@@ -61,17 +61,15 @@ class AxiomVergeLogic(LogicMixin):
             'Heat Seeker',
             }) or
             self._axiomverge_has_nova(world, player))
-        
+
     def _axiomverge_can_do_damage(self, world: MultiWorld, player: int) -> bool:
-        return (
-            self._axiomverge_has_grapple(world, player) or
+        return (self._axiomverge_has_grapple(world, player) or
             self._axiomverge_has_drill(world, player) or
-            self._axiomverge_has_weapon(world, player) or
-            )
+            self._axiomverge_has_weapon(world, player))
 
     def _axiomverge_has_height_augment(self, world: MultiWorld, player: int) -> bool:
         return self.has_any({'Grapple', 'Field Disruptor', 'Drone Teleport'})
-    
+
     def _axiomverge_has_grapple(self, world: MultiWorld, player: int) -> bool:
         return self.has('Grapple', player)
 
@@ -87,9 +85,9 @@ class AxiomVergeLogic(LogicMixin):
     def _axiomverge_has_dash(self, world: MultiWorld, player: int) -> bool:
         return self.has_any({'Trenchcoat', 'Red Coat', player})
 
-    def _axiomverge_has_high_dash(self, world: MultiWOrld, player: int) -> bool:
-        return (self.has('Field Disruptor') and self._axiomverge_has_dash(world,player)) or
-            self._axiom_verge_can_drone_fly(world, player)
+    def _axiomverge_has_high_dash(self, world: MultiWorld, player: int) -> bool:
+        return ((self.has('Field Disruptor') and self._axiomverge_has_dash(world,player)) or
+            self._axiom_verge_can_drone_fly(world, player))
 
     def _axiomverge_has_redcoat(self, world: MultiWorld, player: int) -> bool:
         return self.has('Red Coat', player)
@@ -129,11 +127,9 @@ class AxiomVergeLogic(LogicMixin):
                  self._axiomverge_has_drone_teleport(world, player)))
 
     def _axiomverge_has_go_mode(self, world: MultiWorld, player: int) -> bool:
-        grapple_go_mode =
-            is_option_enabled(world, player, "Masochist") and
-            self.has_all({'Grapple', 'Field Disruptor'})
+        grapple_go_mode = (is_option_enabled(world, player, "Masochist") and
+                           self.has_all({'Grapple', 'Field Disruptor'}))
 
-        drone_go_mode =
-            self._axiomverge_can_drone_fly(world, player)
+        drone_go_mode = self._axiomverge_can_drone_fly(world, player)
 
         return self.has('Red Coat', player) and (grapple_go_mode or drone_go_mode)
