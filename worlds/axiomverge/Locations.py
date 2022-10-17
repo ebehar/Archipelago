@@ -224,16 +224,17 @@ def get_locations(world: Optional[MultiWorld], player: Optional[int]) -> Tuple[L
             
             # 4101084 - 4101098
             # 15 Items
-            LocationData('Edin', 'Edin: Zombie Alcove 1', 4101084),
-            LocationData('Edin', 'Edin: Zombie Alcove 2', 4101085),
-            LocationData('Edin', 'Edin: Axiom 1', 4101086),
-            LocationData('Edin', 'Edin: Above the Worms', 4101087),
-            LocationData('Edin', 'Edin: Bird Room Top', 4101088),
-            LocationData('Edin', 'Edin: Bird Room Drill Blocks', 4101089),
-            LocationData('Edin', 'Edin: Secret Tunnel', 4101090),
-            LocationData('Edin', 'Edin: Owl City Needle Disposal', 4101091),
-            LocationData('Edin', 'Edin: Above Ukkina-Na Exit', 4101092),
-            LocationData('Edin', 'Edin: Bunker', 4101093),
+            LocationData('Edin East', 'Edin: Zombie Alcove 1', 4101084),
+            LocationData('Edin East', 'Edin: Zombie Alcove 2', 4101085),
+                                        
+            LocationData('Edin West', 'Edin: Axiom 1', 4101086),
+            LocationData('Central Edin', 'Edin: Above the Worms', 4101087),
+            LocationData('Central Edin', 'Edin: Bird Room Top', 4101088),
+            LocationData('Edin West', 'Edin: Bird Room Drill Blocks', 4101089),
+            LocationData('Edin West', 'Edin: Secret Tunnel', 4101090),
+            LocationData('Edin West', 'Edin: Owl City Needle Disposal', 4101091),
+            LocationData('Edin West', 'Edin: Above Ukkina-Na Exit', 4101092),
+            LocationData('Central Edin', 'Edin: Bunker', 4101093),
             
             LocationData('Edin Tower', 'Edin Tower: Drone Secret', 4101094),
             LocationData('Edin Tower', 'Edin Tower: Drone-n-Coat Room', 4101095),
