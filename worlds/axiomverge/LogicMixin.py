@@ -3,12 +3,15 @@ from ..AutoWorld import LogicMixin
 from .Options import is_option_enabled
 
 class AxiomVergeLogic(LogicMixin):
-    def _axiomverge_can_reach_outer_attic:
+    def _axiomverge_has_high_reach(self, world: MultiWorld, player: int):
+        return self.has_any({'Trenchcoat', 'Red Coat', 'Grapple', 'Drone Teleport'})
+    
+    def _axiomverge_can_reach_outer_attic(self, world: MultiWorld, player: int):
         return (self.has_any({'Red Coat', 'Drone Teleport'}, player) or
                 (self.has_any({'Grapple', 'Field Disruptor'}, player) and
                  self.has('Trenchcoat', player)))
     
-    def _axiomverge_can_reach_left_side_attic:
+    def _axiomverge_can_reach_left_side_attic(self, world: MultiWorld, player: int):
         return (self._axiomverge_can_reach_outer_attic(world, player) or
                 self.has('Grapple', player))
     
@@ -65,6 +68,9 @@ class AxiomVergeLogic(LogicMixin):
             self._axiomverge_has_drill(world, player) or
             self._axiomverge_has_weapon(world, player) or
             )
+
+    def _axiomverge_has_height_augment(self, world: MultiWorld, player: int) -> bool:
+        return self.has_any({'Grapple', 'Field Disruptor', 'Drone Teleport'})
     
     def _axiomverge_has_grapple(self, world: MultiWorld, player: int) -> bool:
         return self.has('Grapple', player)
@@ -83,7 +89,7 @@ class AxiomVergeLogic(LogicMixin):
 
     def _axiomverge_has_high_dash(self, world: MultiWOrld, player: int) -> bool:
         return (self.has('Field Disruptor') and self._axiomverge_has_dash(world,player)) or
-            self.axiom_verge_can_drone_fly(world, player)
+            self._axiom_verge_can_drone_fly(world, player)
 
     def _axiomverge_has_redcoat(self, world: MultiWorld, player: int) -> bool:
         return self.has('Red Coat', player)
@@ -114,16 +120,20 @@ class AxiomVergeLogic(LogicMixin):
                 self.has('Enhanced Drone Launch', player))
 
     def _axiomverge_can_drone_fly(self, world: MultiWorld, player: int) -> bool:
-        return (self.has_drone_teleport(world, player) and
+        return (self._axiomverge_has_drone_teleport(world, player) and
                 (self.has('Laser Drill', player) or self._axiomverge_has_ad1(world, player)))
 
-    def _axiomverge_can_reach_last_item(self, world: MultiWorld, player: int) -> bool:
+    def _axiomverge_can_do_clone_backwards(self, world: MultiWorld, player: int) -> bool:
+        return (self._axiomverge_has_dash(world, player) and
+                (self._axiomverge_has_grapple(world, player) or
+                 self._axiomverge_has_drone_teleport(world, player)))
+
+    def _axiomverge_has_go_mode(self, world: MultiWorld, player: int) -> bool:
         grapple_go_mode =
             is_option_enabled(world, player, "Masochist") and
-            self.has_all({'Red Coat', 'Grapple', 'Field Disruptor'})
+            self.has_all({'Grapple', 'Field Disruptor'})
 
         drone_go_mode =
-            self._axiomverge_can_drone_fly(world, player) or
-            self._axiomverge_has_long_drone_teleport(world, player)
+            self._axiomverge_can_drone_fly(world, player)
 
-        return (grapple_go_mode or drone_go_mode)
+        return self.has('Red Coat', player) and (grapple_go_mode or drone_go_mode)
