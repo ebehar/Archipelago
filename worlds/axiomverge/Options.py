@@ -3,14 +3,15 @@ from BaseClasses import MultiWorld
 from Options import Toggle, DefaultOnToggle, DeathLink, Choice, Range, Option, OptionDict
 from schema import Schema, And, Optional
 
+
 class Masochist(Toggle):
     "Place the Drone Teleport in Disco Hell, requiring the Disco Hell Rocket Jump"
     display_name = "Masochist"
 
 
-class PasswordChecks(Toggle):
-    "Password Tool checks can contain progression items"
-    display_name = "Password Checks"
+class PasscodeChecks(Toggle):
+    "Passcode Tool checks can contain progression items"
+    display_name = "Passcode Checks"
 
 
 class ReplaceNotes(Choice):
@@ -47,18 +48,30 @@ class GrappleClips(Toggle):
 
 class VoidWarps(Toggle):
     "Void warps (teleporting the drone by hatching it out of bounds) will be considered logical access to items"
-    display_name = "VoidWarps"
+    display_name = "Void Warps"
 
 
 class BossRandomizer(Toggle):
     "Randomize which boss appears in which location"
-    display_name = "BossRandomizer"
+    display_name = "Boss Randomizer"
 
 
 class YouAintGoinNowhere(Toggle):
     "Add laser barriers to Xedur Hul's room"
     display_name = "You Ain't Goin' Nowhere"
 
+
+axiomverge_options: Dict[str, Option] = {
+    "Masochist": Masochist,
+    "PasscodeChecks": PasscodeChecks,
+    "ReplaceNotes": ReplaceNotes,
+    #"DamageRando": DamageRando,
+    #"AllowBlindNavigation": AllowBlindNavigation,
+    #"GrappleClips": GrappleClips,
+    #"VoidWarps": VoidWarps,
+    #"BossRandomizer": BossRandomizer,
+    #"YouAintGoinNowhere": YouAintGoinNowhere,
+    }
 
 def is_option_enabled(world: MultiWorld, player: int, name: str) -> bool:
     return get_option_value(world, player, name) > 0
