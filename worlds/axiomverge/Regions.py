@@ -1,9 +1,9 @@
-from typing import Dict, List, Tuple, Callable
+from typing import Dict, List, Tuple, Callable, Set
 from BaseClasses import MultiWorld, Region, Entrance, Location, RegionType
 from .Options import is_option_enabled
 from .Locations import LocationData
 
-region_names: List[str] = {
+region_names: Set[str] = {
     'Eribu',
     'Lower Eribu',
     'Eribu Secret',
@@ -32,22 +32,22 @@ region_names: List[str] = {
     'Inner E-Kur-Mah',
 
     'Mar-Uru',
-    }
+}
 
 
 def create_regions(world: MultiWorld, player: int, locations: Tuple[LocationData, ...],
                    location_cache: List[Location]):
     locations_per_region = get_locations_per_region(locations)
 
-    regions = [ create_region(world, player, locations_per_region, location_cache, region_name) for
-                region_name in region_names ]
+    regions = [create_region(world, player, locations_per_region, location_cache, region_name) for
+               region_name in region_names]
 
     world.regions += regions
 
     names: Dict[str, int] = {}
 
     build_connections(world, player, names)
-    
+
 
 def get_locations_per_region(locations: Tuple[LocationData, ...]) -> Dict[str, List[LocationData]]:
     per_region: Dict[str, List[LocationData]] = {}
@@ -75,7 +75,8 @@ def create_region(world: MultiWorld, player: int, locations_per_region: Dict[str
 
     if name in locations_per_region:
         for location_data in locations_per_region[name]:
-            location = create_location(player, location_data, region, location_cache)
+            location = create_location(
+                player, location_data, region, location_cache)
             region.locations.append(location)
 
     return region
@@ -98,7 +99,7 @@ def _connect(world: MultiWorld, player: int, used_names: Dict[str, int], source:
     connection.access_rule = rule
 
     source_region.exits.append(connection)
-    connection.connect(target_region)    
+    connection.connect(target_region)
 
 
 def connect(world: MultiWorld, player: int, used_names: Dict[str, int], source: str, target: str,
@@ -112,10 +113,10 @@ def build_return_to_eribu_connections(world: MultiWorld, player: int, used_names
     for region_name in region_names:
         if region_name == 'Eribu':
             continue
-        
+
         _connect(world, player, used_names, region_name, 'Eribu',
                  lambda state: True)
-        
+
 
 # Eribu connects to Absu, Indi, and Ukkin-Na
 def build_eribu_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
@@ -148,9 +149,12 @@ def build_eribu_connections(world: MultiWorld, player: int, used_names: Dict[str
                            state._axiomverge_has_redcoat(world, player)))
 
 # Absu connects to Eribu, Indi, and Zi
+
+
 def build_absu_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
     connect(world, player, used_names, 'Absu', 'Central Absu',
-            lambda state: state._axiomverge_can_pass_laser_walls(world, player),
+            lambda state: state._axiomverge_can_pass_laser_walls(
+                world, player),
             lambda state: state._axiomverge_can_do_damage(world, player))
     connect(world, player, used_names, 'Central Absu', 'Indi',
             lambda state: state._axiomverge_has_high_reach(world, player),
@@ -165,11 +169,11 @@ def build_absu_connections(world: MultiWorld, player: int, used_names: Dict[str,
 
 # Zi connects to Absu, Indi, and Kur
 def build_zi_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
-    connect (world, player, used_names, 'Zi', 'Upper Zi',
-             lambda state: (state._axiomverge_can_do_damage(world, player) and
-                            (state._axiomverge_has_highjump(world, player) or
-                             state._axiomverge_has_high_reach(world, player))),
-             lambda state: True)
+    connect(world, player, used_names, 'Zi', 'Upper Zi',
+            lambda state: (state._axiomverge_can_do_damage(world, player) and
+                           (state._axiomverge_has_highjump(world, player) or
+                            state._axiomverge_has_high_reach(world, player))),
+            lambda state: True)
     connect(world, player, used_names, 'Upper Zi', 'Indi',
             lambda state: state._axiomverge_has_high_reach(world, player),
             lambda state: True)
@@ -224,10 +228,10 @@ def build_edin_connections(world: MultiWorld, player: int, used_names: Dict[str,
 
     connect(world, player, used_names, 'Edin West', 'Central Edin',
             lambda state: (state._axiomverge_has_bomb(world, player) or
-                           (state._axiomverge_has_dash(world,player) and
-                            state._axiomverge_has_height_augment(world,player))),
+                           (state._axiomverge_has_dash(world, player) and
+                            state._axiomverge_has_height_augment(world, player))),
             lambda state: (state._axiomverge_has_bomb(world, player) or
-                           state._axiomverge_can_do_clone_backwards(world,player)))
+                           state._axiomverge_can_do_clone_backwards(world, player)))
 
     connect(world, player, used_names, 'Edin West', 'Edin Tower',
             lambda state: (state._axiomverge_has_dash(world, player) and

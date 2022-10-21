@@ -1,0 +1,2 @@
+LOCATION_NAMES = {
+    }
