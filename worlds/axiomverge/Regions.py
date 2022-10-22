@@ -1,39 +1,19 @@
-from typing import Dict, List, Tuple, Callable, Set
+from typing import Callable, Dict, List, NamedTuple, Tuple, Set
 from BaseClasses import MultiWorld, Region, Entrance, Location, RegionType
 from .Options import is_option_enabled
+from Constants.RegionsAndLocations import REGION_NAMES
 from .Locations import LocationData
 
-region_names: Set[str] = {
-    'Eribu',
-    'Lower Eribu',
-    'Eribu Secret',
 
-    'Absu',
-    'Central Absu',
-    'Inner Absu',
+class EntranceData(NamedTuple):
+    name: str
+    access_rule: Callable
+    vanilla_dest: str
 
-    'Zi',
-    'Upper Zi',
 
-    'Lower Kur',
-    'Upper Kur',
-    'Snowy Kur',
+entrance_table: Dict[str, EntranceData] = {
 
-    'Indi',
-
-    'Ukkin-Na',
-
-    'Edin West',
-    'Edin East',
-    'Central Edin',
-    'Edin Tower',
-
-    'E-Kur-Mah',
-    'Inner E-Kur-Mah',
-
-    'Mar-Uru',
-}
-
+    }
 
 def create_regions(world: MultiWorld, player: int, locations: Tuple[LocationData, ...],
                    location_cache: List[Location]):
@@ -108,137 +88,131 @@ def connect(world: MultiWorld, player: int, used_names: Dict[str, int], source: 
     _connect(world, player, used_names, target, source, return_rule)
 
 
-# You can always teleport back to Eribu via the main menu
-def build_return_to_eribu_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
-    for region_name in region_names:
-        if region_name == 'Eribu':
-            continue
-
-        _connect(world, player, used_names, region_name, 'Eribu',
-                 lambda state: True)
-
-
 # Eribu connects to Absu, Indi, and Ukkin-Na
 def build_eribu_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
+    _connect(world, player, used_names, 'Menu', 'Eribu',
+            lambda state: True)
+
     connect(world, player, used_names, 'Eribu', 'Lower Eribu',
-            lambda state: (state._axiomverge_has_drill(world, player) or
-                           state._axiomverge_can_grappleclip(world, player)),
-            lambda state: state._axiomverge_has_drill(world, player)
+            lambda state: (state.has_drill(world, player) or
+                           state.can_grappleclip(world, player)),
+            lambda state: state.has_drill(world, player)
             )
 
     connect(world, player, used_names, 'Eribu', 'Eribu Secret',
-            lambda state: (state._axiomverge_has_redcoat(world, player) or
-                           state._axiomverge_has_drone_teleport(world, player) or
-                           ((state._axiomverge_has_grapple(world, player) or
-                             state._axiomverge_has_highdash(world, player)) and
-                            state._axiomverge_has_drill(world, player))),
-            lambda state: state._axiomverge_has_drill(world, player))
+            lambda state: (state.has_redcoat(world, player) or
+                           state.has_drone_teleport(world, player) or
+                           ((state.has_grapple(world, player) or
+                             state.has_highdash(world, player)) and
+                            state.has_drill(world, player))),
+            lambda state: state.has_drill(world, player))
 
     connect(world, player, used_names, 'Lower Eribu', 'Absu',
             lambda state: True,
             lambda state: True)
 
     connect(world, player, used_names, 'Lower Eribu', 'Indi',
-            lambda state: state._axiomverge_has_high_reach(world, player),
-            lambda state: state._axiomverge_has_high_reach(world, player))
+            lambda state: state.has_high_reach(world, player),
+            lambda state: state.has_high_reach(world, player))
 
     connect(world, player, used_names, 'Lower Eribu', 'Ukkin-Na',
-            lambda state: (state._axiomverge_has_ad2(world, player) or
-                           state._axiomverge_has_redcoat(world, player)),
-            lambda state: (state._axiomverge_has_ad2(world, player) or
-                           state._axiomverge_has_redcoat(world, player)))
+            lambda state: (state.can_pass_thick_glitch_walls(world, player) and
+                           state.has_wallwalk(world, player)),
+            lambda state: (state.can_pass_thick_glitch_walls(world, player) and
+                           state.has_dash(world,player)))
+
 
 # Absu connects to Eribu, Indi, and Zi
-
-
 def build_absu_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
     connect(world, player, used_names, 'Absu', 'Central Absu',
-            lambda state: state._axiomverge_can_pass_laser_walls(
+            lambda state: state.can_pass_laser_walls(
                 world, player),
-            lambda state: state._axiomverge_can_do_damage(world, player))
+            lambda state: state.can_do_damage(world, player))
     connect(world, player, used_names, 'Central Absu', 'Indi',
-            lambda state: state._axiomverge_has_high_reach(world, player),
+            lambda state: state.has_high_reach(world, player),
             lambda state: True)
     connect(world, player, used_names, 'Central Absu', 'Inner Absu',
-            lambda state: True,
+            lambda state: state.has_ad1(world, player),
             lambda state: True)
     connect(world, player, used_names, 'Inner Absu', 'Zi',
             lambda state: True,
-            lambda state: state._axiomverge_has_high_reach(world, player))
+            lambda state: state.has_high_reach(world, player))
 
 
 # Zi connects to Absu, Indi, and Kur
 def build_zi_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
     connect(world, player, used_names, 'Zi', 'Upper Zi',
-            lambda state: (state._axiomverge_can_do_damage(world, player) and
-                           (state._axiomverge_has_highjump(world, player) or
-                            state._axiomverge_has_high_reach(world, player))),
+            lambda state: (state.can_do_damage(world, player) and
+                           (state.has_highjump(world, player) or
+                            state.has_high_reach(world, player))),
             lambda state: True)
     connect(world, player, used_names, 'Upper Zi', 'Indi',
-            lambda state: state._axiomverge_has_high_reach(world, player),
+            lambda state: state.has_high_reach(world, player),
             lambda state: True)
     connect(world, player, used_names, 'Zi', 'Lower Kur',
-            lambda state: state._axiomverge_can_do_damage(world, player),
+            lambda state: state.can_do_damage(world, player),
             lambda state: True)
 
 
 # Kur connects to Zi, Indi, Edin, and E-Kur-Mah
 def build_kur_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
     connect(world, player, used_names, 'Lower Kur', 'Upper Kur',
-            lambda state: state._axiomverge_has_wallwalk(world, player),
-            lambda state: state._axiomverge_has_wallwalk(world, player))
+            lambda state: state.has_wallwalk(world, player),
+            lambda state: state.has_wallwalk(world, player))
 
     connect(world, player, used_names, 'Upper Kur', 'Snowy Kur',
             # This might be a little conservative
-            lambda state: (state._axiomverge_has_drone_teleport(world, player) or
-                           state._axiomverge_has_high_dash(world, player) or
-                           (state._axiomverge_has_grapple(world, player) and
-                            state._axiomverge_has_highjump(world, player))),
+            lambda state: (state.has_drone_teleport(world, player) or
+                           state.has_high_dash(world, player) or
+                           (state.has_grapple(world, player) and
+                            state.has_highjump(world, player))),
             lambda state: True)
 
     connect(world, player, used_names, 'Snowy Kur', 'E-Kur-Mah',
-            lambda state: (state._axiomverge_has_drone_teleport(world, player) and
-                           state._axiomverge_has_dash(world, player)),
-            lambda state: (state._axiomverge_has_drone_teleport(world, player) and
-                           state._axiomverge_has_dash(world, player)))
+            lambda state: state.can_pass_temple_entrance(world, player),
+            lambda state: state.can_pass_temple_entrance(world, player))
 
     connect(world, player, used_names, 'Upper Kur', 'Edin East',
-            lambda state: (state._axiomverge_has_ad2(world, player) or
-                           state._axiomverge_has_dash(world, player)),
-            lambda state: (state._axiomverge_has_ad2(world, player) or
-                           state._axiomverge_has_dash(world, player)))
+            lambda state: (state.has_ad2(world, player) or
+                           state.has_dash(world, player)),
+            lambda state: (state.has_ad2(world, player) or
+                           state.has_dash(world, player)))
+
+    connect(world, player, used_names, 'Upper Kur', 'E-Kur-Mah',
+            lambda state: state.has_redcoat(world, player),
+            lambda state: state.has_redcoat(world, player))
 
 
 # Ukkin-Na connects to Indi, Edin, and Mar-Uru
 def build_ukkin_na_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
     connect(world, player, used_names, 'Ukkin-Na', 'Edin West',
-            lambda state: state._axiomverge_has_dash(world, player),
-            lambda state: state._axiomverge_has_dash(world, player))
+            lambda state: state.has_dash(world, player),
+            lambda state: state.has_dash(world, player))
 
     connect(world, player, used_names, 'Ukkin-Na', 'Mar-Uru',
-            lambda state: state._axiomverge_has_go_mode(world, player),
+            lambda state: state.has_go_mode(world, player),
             lambda state: True)
 
 
 # Edin connects to Ukkin-Na, Indi, and Kur
 def build_edin_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
     connect(world, player, used_names, 'Edin East', 'Central Edin',
-            lambda state: state._axiomverge_has_bomb(world, player),
-            lambda state: state._axiomverge_has_bomb(world, player))
+            lambda state: state.has_bomb(world, player),
+            lambda state: state.has_bomb(world, player))
 
     connect(world, player, used_names, 'Edin West', 'Central Edin',
-            lambda state: (state._axiomverge_has_bomb(world, player) or
-                           (state._axiomverge_has_dash(world, player) and
-                            state._axiomverge_has_height_augment(world, player))),
-            lambda state: (state._axiomverge_has_bomb(world, player) or
-                           state._axiomverge_can_do_clone_backwards(world, player)))
+            lambda state: (state.has_bomb(world, player) or
+                           (state.has_dash(world, player) and
+                            state.has_height_augment(world, player))),
+            lambda state: (state.has_bomb(world, player) or
+                           state.can_do_clone_backwards(world, player)))
 
     connect(world, player, used_names, 'Edin West', 'Edin Tower',
-            lambda state: (state._axiomverge_has_dash(world, player) and
-                           (state._axiomverge_has_bomb(world, player) or
-                            state._axiomverge_has_height_augment(world, player))),
-            lambda state: (state._axiomverge_has_dash(world, player) or
-                           state._axiomverge_has_bomb(world, player)))
+            lambda state: (state.has_dash(world, player) and
+                           (state.has_bomb(world, player) or
+                            state.has_height_augment(world, player))),
+            lambda state: (state.has_dash(world, player) or
+                           state.has_bomb(world, player)))
 
 
 def build_connections(world: MultiWorld, player: int, used_names: Dict[str, int]):
