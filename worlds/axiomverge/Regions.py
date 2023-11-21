@@ -6,14 +6,40 @@ from .Locations import LocationData
 
 
 class EntranceData(NamedTuple):
-    name: str
-    access_rule: Callable
-    vanilla_dest: str
+    source: int
+    vanilla_dest: int
+    exit_rule: Callable
 
 
-entrance_table: Dict[str, EntranceData] = {
+entrance_table: List[List[EntranceData]] = []
 
-    }
+def generate_entrance_data(world: MultiWorld, player: int):
+        # Region 0 is 'Menu', Region 1 is Eribu
+        entrance_table = [
+            [EntranceData(0, 1, lambda state: True, lambda state: True)],
+
+            # Eribu
+            [
+                EntranceData(1, 2,
+                    lambda state: (state.has_drill(world, player) or
+                        state.can_grappleclip(world, player)),
+                    lambda state: state.has_drill(world, player)),
+
+                EntranceData(1, 3, 
+                    lambda state: state.can_reach_eribu_secret(world, player),
+                    lambda state: state.has_drill(world, player)),
+                ]
+
+            # Lower Eribu
+            [
+                EntranceData(2, 13,
+                    lambda state: state.can_pass_thick_glitch_walls(world, player),
+                    lambda state: state.can_pass_thick_glitch_walls(world, player)),
+                EntranceData(2, 12,
+                    lambda state: state.has_high_reach(world, player),
+                    lambda state: state.has_high_reach(world, player)),
+                ]
+
 
 def create_regions(world: MultiWorld, player: int, locations: Tuple[LocationData, ...],
                    location_cache: List[Location]):

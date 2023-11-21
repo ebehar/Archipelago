@@ -145,6 +145,11 @@ class AxiomVergeLogic(LogicMixin):
     # Entrance Logic
     ###################
 
+    def can_reach_eribu_secret(self, world: MultiWorld, player: int) -> bool:
+        return (state.has_drill(world, player) and
+                (state.has_grapple(world, player) or
+                 state.has_highdash(world,player)))
+
     def can_pass_thick_glitch_walls(self, world: MultiWorld, player: int) -> bool:
         return (self.has_ad2(world, player) or
                 self.has_redcoat(world, player))
